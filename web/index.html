@@ -6,6 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>c.com</title>
+    <style>
+        li {
+            list-style-type: none;
+        }
+    </style>
 </head>
 
 <body>
@@ -31,14 +36,14 @@
                 });
 
                 data2.imgs.forEach((ele, i) => {
-                    html += `<li>${i + data2.videos.length + 1}. [图片] <div><a href="?imgname=${ele.name}">${ele.name}</a></div><img style="width:100%" src="${ele.list[0]}" /></li>`;
+                    html += `<li><div>${i + data2.videos.length + 1}. [图片] <a href="?imgname=${encodeURIComponent(ele.name)}">${ele.name}</a></div><img style="width:100%" src="${filePathToUrl(ele.list[0])}" /></li>`;
                 });
             } else {
                 var ele = data2.imgs.find(it => it.name == urlparms.imgname);
                 if (ele) {
                     var ihtml = `<div>${ele.name}</div>`;
                     ele.list.forEach((ele) => {
-                        ihtml += `<img src="${ele}" />`;
+                        ihtml += `<img src="${filePathToUrl(ele)}" />`;
                     });
                     html += `<li>${ihtml}</li>`;
                     html += `<li><a href="?">返回</a></li>`;
@@ -53,11 +58,16 @@
             render(data);
         })
 
+        function filePathToUrl(filepath) {
+            var arr = filepath.split("/");
+            return arr.map((e) => encodeURIComponent(e)).join("/");
+        }
+
         function initData(d) {
             var r = { imgs: [], videos: [] };
             d.forEach(ele => {
                 loop(ele, null, (file, pathUrl) => {
-                    var fileUrl = encodeURIComponent(file.value);
+                    var fileUrl = file.value;
 
                     if (exts.some((ext) => fileUrl.endsWith(ext))) {
                         r.videos.push(pathUrl + fileUrl);
