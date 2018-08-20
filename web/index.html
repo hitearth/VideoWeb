@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>c.com</title>
+</head>
+
+<body>
+    <ul id="content"> </ul>
+    <script>
+        var page = 0;
+        var urlparms = getUrlParms();
+
+        if (urlparms.imgname) {
+            page = 1;
+        }
+
+        var exts = [".mp4", ".m3u8", ".exe", ".pdb"];
+        var imgexts = [".jpg", ".png", ".gif"];
+        function render(data) {
+            var html = '';
+            var content = document.getElementById("content");
+            var data2 = initData(data);
+            if (page == 0) {
+                data2.videos.forEach((file, i) => {
+                    var ihtml = `<a href="${file}">${file}</a>`;
+                    html += `<li>${i + 1}. [视频] ${ihtml}</li>`;
+                });
+
+                data2.imgs.forEach((ele, i) => {
+                    html += `<li>${i + data2.videos.length + 1}. [图片] <div><a href="?imgname=${ele.name}">${ele.name}</a></div><img style="width:100%" src="${ele.list[0]}" /></li>`;
+                });
+            } else {
+                var ele = data2.imgs.find(it => it.name == urlparms.imgname);
+                if (ele) {
+                    var ihtml = `<div>${ele.name}</div>`;
+                    ele.list.forEach((ele) => {
+                        ihtml += `<img src="${ele}" />`;
+                    });
+                    html += `<li>${ihtml}</li>`;
+                    html += `<li><a href="?">返回</a></li>`;
+                }
+            }
+
+
+            content.innerHTML = html;
+        }
+        get("/v/a.json", (c) => {
+            var data = JSON.parse(c);
+            render(data);
+        })
+
+        function initData(d) {
+            var r = { imgs: [], videos: [] };
+            d.forEach(ele => {
+                loop(ele, null, (file, pathUrl) => {
+                    var fileUrl = encodeURIComponent(file.value);
+
+                    if (exts.some((ext) => fileUrl.endsWith(ext))) {
+                        r.videos.push(pathUrl + fileUrl);
+                    } else if (imgexts.some((ext) => fileUrl.endsWith(ext))) {
+                        var one = r.imgs.find(i => i.name == pathUrl);
+                        if (!one) {
+                            one = { name: pathUrl, list: [] };
+                            r.imgs.push(one);
+                        }
+                        one.list.push(pathUrl + fileUrl);
+                    }
+                });
+            });
+            return r;
+
+            function loop(d, parent, callback) {
+                parent = parent || "./";
+                if (d.value) {
+                    d.value = d.value.toLowerCase();
+                    callback(d, parent);
+                } else {
+                    d.childNodes.forEach((d0) => {
+                        loop(d0, parent + d.path + "/", callback);
+                    });
+                }
+            }
+        }
+
+
+        function getUrlParms() {
+            var query = location.search.substring(1);
+            var args = {};
+            var pairs = query.split("&");
+
+            for (var i = 0; i < pairs.length; i++) {
+
+                var pos = pairs[i].indexOf('=');
+
+                if (pos == -1) continue;
+
+                var argname = pairs[i].substring(0, pos);
+                var value = pairs[i].substring(pos + 1);
+                args[argname] = unescape(value);
+
+            }
+
+            return args;
+        }
+        function get(url, fn) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", url, true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
+                    fn.call(this, xhr.responseText);
+                }
+            };
+            xhr.send();
+        }
+
+        function get(url, fn) {
+            var responseText = `[{ "value": "scanfile.exe" }, { "value": "scanfile.exe.config" },
+        { "value": "scanfile.pdb" }, { "value": "scanfile.vshost.exe" }, { "value": "scanfile.vshost.exe.config" },
+        { "value": "scanfile.vshost.exe.manifest" }, {
+            "path": "aaa",
+            "childNodes": [{ "value": "scanfile.exe.config" },
+            { "value": "scanfile.vshost.jpg" }, { "value": "scanfi22le.vshost.jpg" }]
+        }]`;
+            fn.call(this, responseText);
+        }
+    </script>
+</body>
+
+</html>
