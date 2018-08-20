@@ -110,7 +110,7 @@
 
                 var argname = pairs[i].substring(0, pos);
                 var value = pairs[i].substring(pos + 1);
-                args[argname] = unescape(value);
+                args[argname] = decodeURIComponent(value);
 
             }
 
@@ -128,16 +128,16 @@
             xhr.send();
         }
 
-        function get(url, fn) {
-            var responseText = `[{ "value": "scanfile.exe" }, { "value": "scanfile.exe.config" },
-        { "value": "scanfile.pdb" }, { "value": "scanfile.vshost.exe" }, { "value": "scanfile.vshost.exe.config" },
-        { "value": "scanfile.vshost.exe.manifest" }, {
-            "path": "aaa",
-            "childNodes": [{ "value": "scanfile.exe.config" },
-            { "value": "scanfile.vshost.jpg" }, { "value": "scanfi22le.vshost.jpg" }]
-        }]`;
-            fn.call(this, responseText);
-        }
+        // function get(url, fn) {
+        //     var responseText = `[{ "value": "scanfile.exe" }, { "value": "scanfile.exe.config" },
+        // { "value": "scanfile.pdb" }, { "value": "scanfile.vshost.exe" }, { "value": "scanfile.vshost.exe.config" },
+        // { "value": "scanfile.vshost.exe.manifest" }, {
+        //     "path": "aaa",
+        //     "childNodes": [{ "value": "scanfile.exe.config" },
+        //     { "value": "scanfile.vshost.jpg" }, { "value": "scanfi22le.vshost.jpg" }]
+        // }]`;
+        //     fn.call(this, responseText);
+        // }
     </script>
 </body>
 
