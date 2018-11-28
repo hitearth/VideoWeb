@@ -22,39 +22,31 @@ namespace scanfile
             {
                 var extlimits = extlimit.Split(',');
                 predicate = f => extlimits.Contains(f.Extension);
-            }            
+            }
 
             StringBuilder sb = new StringBuilder();
 
             var dir = new DirectoryInfo(path);
             var result = LoopThrough(dir, predicate);
+            result.ForEach(it => it.Path = it.Path.Substring(path.Length).Replace("\\", "/"));
 
-            
-            Console.WriteLine(DNode.getChildNodesJson(result));
-            
+            Console.WriteLine(FNode.getChildNodesJson(result));
+
 
 
         }
 
-        static List<Node> LoopThrough(DirectoryInfo dir, Func<FileInfo, bool> predicate)
+        static List<FNode> LoopThrough(DirectoryInfo dir, Func<FileInfo, bool> predicate)
         {
-            var result = new List<Node>();
+            var result = new List<FNode>();
             foreach (var file in dir.GetFiles())
             {
                 if (predicate != null && !predicate(file)) continue;
-                result.Add(new FNode { Value = file.Name });
+                result.Add(new FNode { Name = file.Name, Path = dir.FullName, Extension = file.Extension.ToLower() });
             }
             foreach (var item in dir.GetDirectories())
             {
-                var childNodes = LoopThrough(item, predicate);
-                if (childNodes != null && childNodes.Count > 0)
-                {
-                    result.Add(new DNode
-                    {
-                        PathValue = item.Name,
-                        childNodes = childNodes
-                    });
-                }
+                result.AddRange(LoopThrough(item, predicate));
             }
             return result;
         }
@@ -70,37 +62,29 @@ namespace scanfile
         }
     }
 
-    public abstract class Node
+    public class FNode
     {
-    }
-    public class FNode : Node
-    {
-        public string Value { get; set; }
+        public string Name { get; set; }
+        public string Path { get; set; }
+        public string Extension { get; set; }
         public override string ToString()
         {
-            return string.Format("{{\"value\":\"{0}\"}}", Value);
+            return string.Format("{{\"Name\":\"{0}\", \"Path\":\"{1}\", \"Extension\":\"{2}\"}}", Name, Path, Extension);
         }
-    }
-    public class DNode : Node
-    {
-        public string PathValue { get; set; }
-        public List<Node> childNodes { get; set; }
-        public override string ToString()
+
+        public static string getChildNodesJson(List<FNode> fNodes)
         {
-            return string.Format("{{\"path\":\"{1}\",\"childNodes\":{0}}}", getChildNodesJson(childNodes), PathValue);
-        }
-        public static string getChildNodesJson(List<Node> childNodes)
-        {
-            if (childNodes == null) return "null";
+            if (fNodes == null) return "null";
             StringBuilder sb = new StringBuilder();
             sb.Append("[");
-            foreach (var item in childNodes)
+            foreach (var item in fNodes)
             {
                 sb.Append(item.ToString() + ",");
             }
-            if (childNodes.Count > 0) sb.Remove(sb.Length - 1, 1);
+            if (fNodes.Count > 0) sb.Remove(sb.Length - 1, 1);
             sb.Append("]");
             return sb.ToString();
         }
     }
+
 }
