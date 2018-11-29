@@ -20,19 +20,19 @@
         var path = urlparms.path || "";
         var links = {};
 
-        var exts = [".mp4", ".m3u8", ".exe", ".pdb"];
+        var exts = [".mp4", ".m3u8", ".vdat", ".exe", ".pdb"];
         var imgexts = [".jpg", ".png", ".gif"];
         function render(data) {
             var html = '';
             var content = document.getElementById("content");
             var data2 = initData(data);
             data2.forEach((fnode, i) => {
-                if (fnode.type = 'video') {
+                if (fnode.type == 'video') {
                     var ihtml = `<a href="${fnode.url}">${fnode.Name}</a>`;
                     html += `<li>${i + 1}. [视频] ${ihtml}</li>`;
                 }
-                else if (fnode.type = 'img') {
-                    html += `<li><div>${i + 1}. [图片] ${ele.name}</div><img style="width:100%" src="${fnode.url}" /></li>`;
+                else if (fnode.type == 'img') {
+                    html += `<li><div>${i + 1}. [图片] ${fnode.Name}</div><img style="width:100%" src="${fnode.url}" /></li>`;
                 }
             });
 
@@ -99,11 +99,11 @@
             xhr.send();
         }
 
-        function get(url, fn) {
-            var responseText = `[{"Name":"scanfile.exe", "Path":"", "Extension":".exe"},{"Name":"scanfile.exe.config", "Path":"", "Extension":".config"},{"Name":"scanfile.pdb", "Path":"", "Extension":".pdb"},{"Name":"scanfile.vshost.exe", "Path":"", "Extension":".exe"},{"Name":"scanfile.vshost.exe.config", "Path":"", "Extension":".config"},{"Name":"scanfile.vshost.exe.manifest", "Path":"", "Extension":".manifest"},{"Name":"新建文本文档.txT", "Path":"", "Extension":".txt"},
-            {"Name":"新建文本文档.txt", "Path":"/订货", "Extension":".txt"}]`;
-            fn.call(this, responseText);
-        }
+        // function get(url, fn) {
+        //     var responseText = `[{"Name":"scanfile.exe", "Path":"", "Extension":".exe"},{"Name":"scanfile.exe.config", "Path":"", "Extension":".config"},{"Name":"scanfile.pdb", "Path":"", "Extension":".pdb"},{"Name":"scanfile.vshost.exe", "Path":"", "Extension":".exe"},{"Name":"scanfile.vshost.exe.config", "Path":"", "Extension":".config"},{"Name":"scanfile.vshost.exe.manifest", "Path":"", "Extension":".manifest"},{"Name":"新建文本文档.txT", "Path":"", "Extension":".txt"},
+        //     {"Name":"新建文本文档.txt", "Path":"/订货", "Extension":".txt"}]`;
+        //     fn.call(this, responseText);
+        // }
     </script>
 </body>
 
